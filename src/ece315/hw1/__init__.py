@@ -35,18 +35,75 @@ def main() -> None:
             xticks=np.arange(-9, 10),
             yticks=np.arange(-7, 8),
         ),
+        Plottable(
+            fn=xp1,
+            title="$x_{p1}(t)$",
+            xlim=(-6, 6),
+            ylim=(-3, 3),
+            xticks=np.arange(-6, 7),
+            yticks=np.arange(-3, 4),
+        ),
+        Plottable(
+            fn=lambda t: get_even_part(xp1, t),
+            title="$x_{p1even}(t)$",
+            xlim=(-6, 6),
+            ylim=(-3, 3),
+            xticks=np.arange(-6, 7),
+            yticks=np.arange(-3, 4),
+        ),
+        Plottable(
+            fn=lambda t: get_odd_part(xp1, t),
+            title="$x_{p1odd}(t)$",
+            xlim=(-6, 6),
+            ylim=(-3, 3),
+            xticks=np.arange(-6, 7),
+            yticks=np.arange(-3, 4),
+        ),
+        Plottable(
+            fn=lambda t: get_odd_part(xp1, t) + get_even_part(xp1, t),
+            title="$x_{p1odd}(t) + x_{p1even}(t)$",
+            xlim=(-6, 6),
+            ylim=(-3, 3),
+            xticks=np.arange(-6, 7),
+            yticks=np.arange(-3, 4),
+        ),
+        Plottable(
+            fn=xp5b,
+            title="$x_{p5b}(t)$",
+            xlim=(-10, 10),
+            ylim=(-10, 10),
+            xticks=np.arange(-10, 10),
+            yticks=np.arange(-10, 10),
+        ),
+        Plottable(
+            fn=lambda t: get_even_part(xp5b, t),
+            title="$x_{p5b,even}(t)$",
+            xlim=(-10, 10),
+            ylim=(-10, 10),
+            xticks=np.arange(-10, 10),
+            yticks=np.arange(-10, 11),
+        ),
+        Plottable(
+            fn=lambda t: get_odd_part(xp5b, t),
+            title="$x_{p5b,odd}(t)$",
+            xlim=(-10, 10),
+            ylim=(-10, 10),
+            xticks=np.arange(-10, 10),
+            yticks=np.arange(-10, 11),
+        ),
+        Plottable(
+            fn=lambda t: get_odd_part(xp5b, t) + get_even_part(xp5b, t),
+            title="$x_{p5b,odd}(t) + x_{p5b,even}(t)$",
+            xlim=(-10, 10),
+            ylim=(-10, 10),
+            xticks=np.arange(-10, 10),
+            yticks=np.arange(-10, 11),
+        ),
     ]
 
     # For each function in plots, create a figure, and plot the function of t on it
     for p in plots:
-        plt.figure()
-        plt.xlim(p.xlim)
-        plt.ylim(p.ylim)
-        plt.xticks(p.xticks)
-        plt.yticks(p.yticks)
-        plt.title(p.title)
-        plt.grid()
-        plt.plot(t, p.fn(t))
+        p.plot(plt, t)
 
     plt.show()
 
@@ -60,6 +117,16 @@ class Plottable:
     ylim: tuple[float, float]
     xticks: np.ndarray
     yticks: np.ndarray
+
+    def plot(self, plt, t: np.npdarray):
+        plt.figure()
+        plt.xlim(self.xlim)
+        plt.ylim(self.ylim)
+        plt.xticks(self.xticks)
+        plt.yticks(self.yticks)
+        plt.title(self.title)
+        plt.grid()
+        plt.plot(t, self.fn(t))
 
 
 # Problem 2a
@@ -104,3 +171,46 @@ def y_tilde(t: np.ndarray) -> np.ndarray:
     Interchange the time shift and time stretch transformations applied to x(t) in y(t)
     """
     return 3 * x((0.75 * t) - 0.5)
+
+
+# Problem 5
+def xp1(t: np.ndarray) -> np.ndarray:
+    """
+    Return the piecewise signal shown in problem 1
+    """
+    return np.piecewise(
+        t,  # the input domain
+        [  # the conditions:
+            t <= -4,
+            ((-4 < t) & (t < 1)),
+            ((1 <= t) & (t <= 3)),
+            (t > 3),
+        ],
+        [  # scalars/functions to be applied to each condition's range:
+            0,
+            lambda t: (3 / 5) * t + (7 / 5),
+            lambda t: (-2) * t + 4,
+            0,
+        ],
+    )
+
+
+def xp5b(t: np.ndarray) -> np.ndarray:
+    """
+    Return the signal defined in problem 5 part b
+    """
+    return (np.power(t, 2) - 2 * t - 3) / (2 * t - 3)
+
+
+def get_even_part(x: Callable, t: np.ndarray) -> np.ndarray:
+    """
+    Return the even part of a given signal
+    """
+    return (1 / 2) * (x(t) + (x(-t)))
+
+
+def get_odd_part(x: Callable, t: np.ndarray) -> np.ndarray:
+    """
+    Return the odd part of a give signal
+    """
+    return (1 / 2) * (x(t) - x(-t))
