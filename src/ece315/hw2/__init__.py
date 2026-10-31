@@ -22,12 +22,26 @@ def main() -> None:
             ylim=(-2, 20),
         ),
         Plottable(
+            fn=x3,
+            title="$x_3[n]$",
+            ylim=(-2, 20),
+        ),
+        Plottable(
             fn=lambda n: bkwd_diff(x1, n),
             title="$y_1[n]$",
         ),
         Plottable(
-            fn=lambda n: bkwd_diff(x2, n),
+            fn=y2,
             title="$y_2[n]$",
+        ),
+        Plottable(
+            fn=lambda n: bkwd_diff(x3, n),
+            title="$y_3[n]$",
+        ),
+        Plottable(
+            fn=lambda n: np.cumsum(y2(n)),
+            title="$\\tilde{x}[n]$",
+            ylim=(-1, 20),
         ),
     ]
 
@@ -73,6 +87,25 @@ def x2(n: np.ndarray) -> np.ndarray:
             lambda n: 2,
         ],
     )
+
+
+def x3(n: np.ndarray) -> np.ndarray:
+    boundary = (n >= -4) & (n <= 4)
+    return np.piecewise(
+        n,
+        [
+            boundary,
+            ~boundary,
+        ],
+        [
+            lambda n: -1 * np.power(n, 2) + 18,
+            lambda n: 0,
+        ],
+    )
+
+
+def y2(n: np.ndarray) -> np.ndarray:
+    return bkwd_diff(x2, n)
 
 
 # Dataclass to hold information about a function and its plot attributes
