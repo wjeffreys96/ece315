@@ -1,13 +1,17 @@
 from collections.abc import Callable
-from dataclasses import dataclass
 
 import numpy as np
 from matplotlib import pyplot as plt
 
+from ece315.plottable import Plottable
+
 XP3A_PERIOD = 63
 XP3C_PERIOD = 672
 XP3A_DOMAIN = np.arange(0, XP3A_PERIOD)
-XP3C_DOMAIN = np.arange(0, XP3C_PERIOD)
+XP3C_DOMAIN = np.arange(0, XP3C_PERIOD, step=5)
+XP4_DOMAIN = np.arange(0, 55)
+
+plt.style.use("seaborn-v0_8-muted")
 
 
 def main() -> None:
@@ -50,43 +54,66 @@ def main() -> None:
             title="$x(n)$ Problem 3 Part a",
             domain=XP3A_DOMAIN,
             xlim=(0, XP3A_PERIOD),
+            ylim=(-5, 5),
             xstep=10,
         ),
         Plottable(
-            fn=lambda n: np.abs(xp3c(n)),
-            title="Magnitude of $x(n)$ for Problem 3 Part c",
-            domain=np.arange(0, 11),
-            xlim=(-1, 11),
+            fn=xp3b,
+            title="$x(n)$ Problem 3 Part b",
+            domain=np.arange(0, 25),
+            xlim=(-1, 25),
+            ylim=(-5, 5),
+            xstep=2,
         ),
         Plottable(
-            fn=lambda n: np.angle(xp3c(n)),
-            title="Phase Angle of $x(n)$ for Problem 3 Part c",
+            fn=xp3c,
+            kind="dtx",
+            title="$x_{p3c}(n)$",
             domain=XP3C_DOMAIN,
             xlim=(0, XP3C_PERIOD),
+            ylim=(-5, 5),
             xstep=50,
         ),
         Plottable(
-            fn=lambda n: np.real(xp3c(n)),
-            title="Real Part of $x(n)$ for Problem 3 Part c",
-            domain=XP3C_DOMAIN,
-            xlim=(0, XP3C_PERIOD),
-            xstep=50,
+            fn=xp3d,
+            kind="dtx",
+            title="$x_{p3d}(n)$",
+            domain=np.arange(-15, 15),
+            xlim=(-15, 15),
+            ylim=(-25, 25),
+            xstep=2,
+            ystep=2,
         ),
         Plottable(
-            fn=lambda n: np.imag(xp3c(n)),
-            title="Imaginary Part of $x(n)$ for Problem 3 Part c",
-            domain=XP3C_DOMAIN,
-            xlim=(0, XP3C_PERIOD),
-            xstep=50,
+            fn=x1p4,
+            title="$x_{1p4}(n)$",
+            ylim=(-5, 5),
+            xlim=(float(np.min(XP4_DOMAIN)) - 1, float(np.max(XP4_DOMAIN) + 1)),
+            xstep=2,
+            domain=XP4_DOMAIN,
+        ),
+        Plottable(
+            fn=x2p4,
+            title="$x_{2p4}(n)$",
+            ylim=(-5, 5),
+            xlim=(float(np.min(XP4_DOMAIN)) - 1, float(np.max(XP4_DOMAIN) + 1)),
+            xstep=2,
+            domain=XP4_DOMAIN,
         ),
     ]
 
     # For each function in plots, create a figure, and plot the function of n on it
     for p in plots:
-        p.stem(plt)
+        p.plot(plt)
 
-    print(f"Average power of xp3a: {avg_pow_periodic(xp3a, XP3A_DOMAIN)}")
-    print(f"Average power of xp3c: {avg_pow_periodic(xp3c, XP3C_DOMAIN)}")
+    print(
+        f"Average power of xp3a: {avg_pow_periodic(xp3a, np.arange(0, XP3A_PERIOD + 1))} square peanut butter and jelly sandwiches"
+    )
+    print(
+        f"Average power of xp3c: {avg_pow_periodic(xp3c, XP3C_DOMAIN)} square peanut butter and jelly sandwiches"
+    )
+    n = np.arange(0, 55)
+    print(f"(Problem 4) x1 == x2: {np.allclose(x1p4(n), x2p4(n))}")
 
     try:
         plt.show()
@@ -155,44 +182,24 @@ def xp3a(n: np.ndarray) -> np.ndarray:
     return (8 / 3) * np.sin(((8 * np.pi * n) / 63) + ((3 * np.pi) / 5))
 
 
+def xp3b(n: np.ndarray) -> np.ndarray:
+    return (8 / 3) * np.sin(((24 * n) / 63) + ((3 * np.pi) / 5))
+
+
 def xp3c(n: np.ndarray) -> np.ndarray:
     return 4 * np.exp(1j * ((n * (5 * np.pi) / 336) - (np.pi / 6)))
 
 
-# Dataclass to hold information about a function and its plot attributes
-@dataclass()
-class Plottable:
-    fn: Callable
-    title: str
-    xlim: tuple[float, float] = (-10, 10)
-    ylim: tuple[float, float] = (-10, 10)
-    xstep: int = 1
-    ystep: int = 1
-    domain: np.ndarray | None = None
+def xp3d(n: np.ndarray) -> np.ndarray:
+    return 3 * np.exp(n * (((-5 * np.pi) / 112) + (7j * np.pi / 100)))
 
-    def _set_styles(self, plt) -> None:
-        plt.xlim(self.xlim)
-        plt.ylim(self.ylim)
-        plt.xticks(np.arange(self.xlim[0], self.xlim[1] + 1, step=self.xstep))
-        plt.yticks(np.arange(self.ylim[0], self.ylim[1] + 1, step=self.ystep))
-        plt.title(self.title)
-        plt.grid()
 
-    def plot(self, plt) -> None:
-        t = (
-            self.domain
-            if self.domain is not None
-            else np.linspace(-10, 10, endpoint=True)
-        )
-        plt.figure()
-        self._set_styles(plt)
-        plt.plot(t, self.fn(t))
+def x1p4(n: np.ndarray) -> np.ndarray:
+    return (5 / 2) * np.cos(((452 * np.pi * n) / 55) + (np.pi / 4))
 
-    def stem(self, plt) -> None:
-        n = self.domain if self.domain is not None else np.arange(-10, 11)
-        plt.figure()
-        self._set_styles(plt)
-        plt.stem(n, self.fn(n))
+
+def x2p4(n: np.ndarray) -> np.ndarray:
+    return (5 / 2) * np.cos(((12 * np.pi * n) / 55) + (np.pi / 4))
 
 
 if __name__ == "__main__":
