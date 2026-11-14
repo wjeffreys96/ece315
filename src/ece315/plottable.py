@@ -62,7 +62,7 @@ class Plottable:
         f2: np.ndarray,
         n: np.ndarray,
         f1_label: str,
-        f2_label,
+        f2_label: str,
     ) -> None:
         plt.figure()
         lo = min(np.min(f1), np.min(f2))
@@ -80,15 +80,15 @@ class Plottable:
         plt.title(self.title)
         plt.grid()
 
-    @staticmethod
-    def _pad(lo: float, hi: float, margin: float = 0.05) -> tuple[float, float]:
-        span = hi - lo
-        pad = margin * span if span > 0 else 1.0
-        return lo - pad, hi + pad
-
     def _set_imstyles(self, plt, lo: float, hi: float) -> None:
         plt.xlim(self._pad(*self.xlim))
         plt.ylim(self._pad(lo, hi))
         plt.xticks(np.arange(self.xlim[0], self.xlim[1] + 1, step=self.xstep))
         plt.grid()
         plt.legend()
+
+    @staticmethod
+    def _pad(lo: float, hi: float, margin: float = 0.05) -> tuple[float, float]:
+        span = hi - lo
+        pad = margin * span if span > 0 else 1.0
+        return lo - pad, hi + pad
