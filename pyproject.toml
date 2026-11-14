@@ -17,6 +17,7 @@ dependencies = [
 ece315 = "ece315:main"
 hw1 = "ece315.hw1:main"
 hw2 = "ece315.hw2:main"
+hw3 = "ece315.hw3:main"
 numba_test = "numba_test:main"
 
 [build-system]

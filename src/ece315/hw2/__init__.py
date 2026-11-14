@@ -115,6 +115,11 @@ def main() -> None:
     n = np.arange(0, 55)
     print(f"(Problem 4) x1 == x2: {np.allclose(x1p4(n), x2p4(n))}")
 
+    # > uv run hw2
+    # Average power of xp3a: 3.5555555555555545 square peanut butter and jelly sandwiches
+    # Average power of xp3c: 16.0 square peanut butter and jelly sandwiches
+    # (Problem 4) x1 == x2: True
+
     try:
         plt.show()
     except KeyboardInterrupt:

@@ -28,6 +28,50 @@ class Plottable:
             case "dtx":
                 self.implot_dt(plt)
 
+    def plot_ct(self, plt) -> None:
+        t = (
+            self.domain
+            if self.domain is not None
+            else np.linspace(-10, 10, endpoint=True)
+        )
+        plt.figure()
+        self._set_styles(plt)
+        plt.plot(t, self.fn(t))
+
+    def implot_ct(self, plt) -> None:
+        raise NotImplementedError
+
+    def plot_dt(self, plt) -> None:
+        n = self.domain if self.domain is not None else np.arange(-10, 11)
+        plt.figure()
+        self._set_styles(plt)
+        plt.stem(n, self.fn(n))
+
+    def implot_dt(self, plt) -> None:
+        n = self.domain if self.domain is not None else np.arange(-10, 11)
+        xn = self.fn(n)
+        self._2func_stem(plt, np.abs(xn), np.angle(xn), n, "Magnitude", "Phase")
+        self._2func_stem(
+            plt, np.real(xn), np.imag(xn), n, "Real Part", "Imaginary Part"
+        )
+
+    def _2func_stem(
+        self,
+        plt,
+        f1: np.ndarray,
+        f2: np.ndarray,
+        n: np.ndarray,
+        f1_label: str,
+        f2_label,
+    ) -> None:
+        plt.figure()
+        lo = min(np.min(f1), np.min(f2))
+        hi = max(np.max(f1), np.max(f2))
+        plt.title(f"{f1_label} and {f2_label} of {self.title}")
+        plt.stem(n, f1, linefmt=":", markerfmt="o", label=f1_label)
+        plt.stem(n, f2, linefmt="--", markerfmt="s", label=f2_label)
+        self._set_imstyles(plt, lo, hi)
+
     def _set_styles(self, plt) -> None:
         plt.xlim(self.xlim)
         plt.ylim(self.ylim)
@@ -48,47 +92,3 @@ class Plottable:
         plt.xticks(np.arange(self.xlim[0], self.xlim[1] + 1, step=self.xstep))
         plt.grid()
         plt.legend()
-
-    def plot_ct(self, plt) -> None:
-        t = (
-            self.domain
-            if self.domain is not None
-            else np.linspace(-10, 10, endpoint=True)
-        )
-        plt.figure()
-        self._set_styles(plt)
-        plt.plot(t, self.fn(t))
-
-    def implot_ct(self, plt) -> None:
-        raise NotImplementedError
-
-    def _2func_stem(
-        self,
-        plt,
-        f1: np.ndarray,
-        f2: np.ndarray,
-        n: np.ndarray,
-        f1_label: str,
-        f2_label,
-    ) -> None:
-        plt.figure()
-        lo = min(np.min(f1), np.min(f2))
-        hi = max(np.max(f1), np.max(f2))
-        plt.title(f"{f1_label} and {f2_label} of {self.title}")
-        plt.stem(n, f1, linefmt=":", markerfmt="o", label=f1_label)
-        plt.stem(n, f2, linefmt="--", markerfmt="s", label=f2_label)
-        self._set_imstyles(plt, lo, hi)
-
-    def implot_dt(self, plt) -> None:
-        n = self.domain if self.domain is not None else np.arange(-10, 11)
-        xn = self.fn(n)
-        self._2func_stem(plt, np.abs(xn), np.angle(xn), n, "Magnitude", "Phase")
-        self._2func_stem(
-            plt, np.real(xn), np.imag(xn), n, "Real Part", "Imaginary Part"
-        )
-
-    def plot_dt(self, plt) -> None:
-        n = self.domain if self.domain is not None else np.arange(-10, 11)
-        plt.figure()
-        self._set_styles(plt)
-        plt.stem(n, self.fn(n))
