@@ -1,5 +1,3 @@
-from collections.abc import Callable
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -9,22 +7,20 @@ plt.style.use("seaborn-v0_8-muted")
 
 
 def main() -> None:
-    n = np.arange(-10, 11)
-
-    plt.figure()
-
-    y = y_p1(n)
-
-    plt.stem(2 * n, y)
-    plt.grid()
-    plt.ylim((-10, 10))
-
     # Create a list of plottable functions
     plots = [
         Plottable(
             title="$y_{p1}[n]$",
-            fn=lambda n: y_p1(n),
-        )
+            fn=y_p1,
+        ),
+        Plottable(
+            title="$h_{p2}[n]$",
+            fn=h_p2,
+            domain=np.arange(-25, 26),
+            xlim=(-10, 25),
+            xstep=2,
+            kind="dtx",
+        ),
     ]
 
     # For each function in plots, create a figure, and plot the function of n on it
@@ -55,8 +51,16 @@ def x_p1(n: np.ndarray) -> np.ndarray:
 
 
 def y_p1(n: np.ndarray) -> np.ndarray:
-    ret = np.convolve(x_p1(n), h_p1(n), "same")
-    return ret
+    return np.convolve(x_p1(n), h_p1(n), "same")
+
+
+def h_p2(n: np.ndarray) -> np.ndarray:
+    u = np.heaviside(n, 1)
+    u_2 = np.heaviside(n - 2, 1)
+    a = (1 - 1j) / 2
+    b = (1 + 1j) / 2
+    h_hat = lambda n: a * (b**n) + b * (a**n)
+    return -2 * h_hat(n) * u + 3 * h_hat(n - 2) * u_2
 
 
 if __name__ == "__main__":
