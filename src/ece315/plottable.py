@@ -39,7 +39,40 @@ class Plottable:
         plt.plot(t, self.fn(t))
 
     def implot_ct(self, plt) -> None:
-        raise NotImplementedError
+        t = (
+            self.domain
+            if self.domain is not None
+            else np.linspace(-10, 10, endpoint=True)
+        )
+        xt = self.fn(t)
+        self._2func_plot(
+            plt,
+            np.real(xt),
+            np.imag(xt),
+            t,
+            f1_label="Real Part",
+            f2_label="Imaginary Part",
+        )
+        self._2func_plot(
+            plt, np.abs(xt), np.angle(xt), t, f1_label="Magnitude", f2_label="Phase"
+        )
+
+    def _2func_plot(
+        self,
+        plt,
+        f1: np.ndarray,
+        f2: np.ndarray,
+        t: np.ndarray,
+        f1_label: str,
+        f2_label: str,
+    ) -> None:
+        plt.figure()
+        lo = min(np.min(f1), np.min(f2))
+        hi = max(np.max(f1), np.max(f2))
+        plt.title(f"{f1_label} and {f2_label} of {self.title}")
+        plt.plot(t, f1, label=f1_label)
+        plt.plot(t, f2, label=f2_label)
+        self._set_imstyles(plt, lo, hi)
 
     def plot_dt(self, plt) -> None:
         n = self.domain if self.domain is not None else np.arange(-10, 11)
@@ -81,9 +114,9 @@ class Plottable:
         plt.grid()
 
     def _set_imstyles(self, plt, lo: float, hi: float) -> None:
-        plt.xlim(self._pad(*self.xlim))
-        plt.ylim(self._pad(lo, hi))
-        plt.xticks(np.arange(self.xlim[0], self.xlim[1] + 1, step=self.xstep))
+        # plt.xlim(self._pad(*self.xlim))
+        # plt.ylim(self._pad(lo, hi))
+        # plt.xticks(np.arange(self.xlim[0], self.xlim[1] + 1, step=self.xstep))
         plt.grid()
         plt.legend()
 

@@ -1,5 +1,10 @@
+import cmath
+from typing import Any
+
 import numpy as np
+import numpy.typing as npt
 from matplotlib import pyplot as plt
+from scipy.signal import freqz
 
 from ece315.plottable import Plottable
 
@@ -20,6 +25,20 @@ def main() -> None:
             xlim=(-10, 25),
             xstep=2,
             kind="dtx",
+        ),
+        Plottable(
+            title="$y_{p3a}[\\Omega]$",
+            fn=y_p3a,
+            domain=np.linspace(0, np.pi, num=512, endpoint=True),
+            xlim=(0, 4),
+            kind="ctx",
+        ),
+        Plottable(
+            title="$y_{p3b}$ - scipy freqz",
+            fn=y_p3b,
+            domain=np.linspace(0, np.pi, num=512, endpoint=True),
+            xlim=(0, 4),
+            kind="ctx",
         ),
     ]
 
@@ -61,6 +80,18 @@ def h_p2(n: np.ndarray) -> np.ndarray:
     b = (1 + 1j) / 2
     h_hat = lambda n: a * (b**n) + b * (a**n)
     return -2 * h_hat(n) * u + 3 * h_hat(n - 2) * u_2
+
+
+def y_p3a(W: np.ndarray) -> npt.ndarray[Any, npt.dtype[complex]]:
+    z = np.exp(1j * W)
+    return (-2 * z**2 + 3 * z) / (z**2 - z + 0.5)
+
+
+def y_p3b(z: np.ndarray) -> np.ndarray:
+    num = [-2, 3]
+    denom = [1, -1, 1 / 2]
+    (_w, h) = freqz(num, denom)
+    return h
 
 
 if __name__ == "__main__":
